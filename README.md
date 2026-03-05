@@ -1,11 +1,9 @@
 # Phosphor Reorder Variants
 
-En enkel Figma-plugin som går gjennom alle `ComponentSet` på aktiv side og bytter fysisk plass mellom:
+En enkel Figma-plugin som går gjennom alle `ComponentSet` på side du er på. Obs den er bygget for en veldig spesifikk oppgave i Phosphor sitt Figma bibliotek.
 
 - `Format = Stroke`, `Weight = Regular`
 - `Format = Stroke`, `Weight = Light`
-
-Pluginen kjører i batcher, viser fremdrift, og lar bruker starte operasjonen manuelt med en `Start`-knapp.
 
 ## Installasjon i Figma
 1. Last ned dette repoet. Det enkleste er å bare trykke på Code -> Download zip
@@ -14,6 +12,7 @@ Pluginen kjører i batcher, viser fremdrift, og lar bruker starte operasjonen ma
 3. Gå til `Plugins` -> `Development` -> `Import plugin from manifest...`
 4. Velg `manifest.json` i denne mappen.
 5. Pluginen dukker opp under `Plugins` -> `Development`.
+6. Obs: Husk å kjør den på siden: "Components" 
 
 ## Bruk
 
@@ -22,11 +21,3 @@ Pluginen kjører i batcher, viser fremdrift, og lar bruker starte operasjonen ma
 3. Trykk `Start` i plugin-vinduet.
 4. Vent til status viser `Ferdig`.
 
-## Utvikling (valgfritt)
-
-Hvis du endrer `code.ts`:
-
-1. Installer avhengigheter:
-   - `npm install`
-2. Bygg TypeScript:
-   - `npm run build`
