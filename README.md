@@ -1,40 +1,31 @@
-Below are the steps to get your plugin running. You can also find instructions at:
+# Phosphor Reorder Variants
 
-  https://www.figma.com/plugin-docs/plugin-quickstart-guide/
+En enkel Figma-plugin som går gjennom alle `ComponentSet` på aktiv side og bytter fysisk plass mellom:
 
-This plugin template uses Typescript and NPM, two standard tools in creating JavaScript applications.
+- `Format = Stroke`, `Weight = Regular`
+- `Format = Stroke`, `Weight = Light`
 
-First, download Node.js which comes with NPM. This will allow you to install TypeScript and other
-libraries. You can find the download link here:
+Pluginen kjører i batcher, viser fremdrift, og lar bruker starte operasjonen manuelt med en `Start`-knapp.
 
-  https://nodejs.org/en/download/
+## Installasjon i Figma
 
-Next, install TypeScript using the command:
+1. Åpne Figma Desktop.
+2. Gå til `Plugins` -> `Development` -> `Import plugin from manifest...`
+3. Velg `manifest.json` i denne mappen.
+4. Pluginen dukker opp under `Plugins` -> `Development`.
 
-  npm install -g typescript
+## Bruk
 
-Finally, in the directory of your plugin, get the latest type definitions for the plugin API by running:
+1. Åpne siden som inneholder `ComponentSet`-ene du vil oppdatere.
+2. Start pluginen fra `Plugins` -> `Development` -> `reorder variants`.
+3. Trykk `Start` i plugin-vinduet.
+4. Vent til status viser `Ferdig`.
 
-  npm install --save-dev @figma/plugin-typings
+## Utvikling (valgfritt)
 
-If you are familiar with JavaScript, TypeScript will look very familiar. In fact, valid JavaScript code
-is already valid Typescript code.
+Hvis du endrer `code.ts`:
 
-TypeScript adds type annotations to variables. This allows code editors such as Visual Studio Code
-to provide information about the Figma API while you are writing code, as well as help catch bugs
-you previously didn't notice.
-
-For more information, visit https://www.typescriptlang.org/
-
-Using TypeScript requires a compiler to convert TypeScript (code.ts) into JavaScript (code.js)
-for the browser to run.
-
-We recommend writing TypeScript code using Visual Studio code:
-
-1. Download Visual Studio Code if you haven't already: https://code.visualstudio.com/.
-2. Open this directory in Visual Studio Code.
-3. Compile TypeScript to JavaScript: Run the "Terminal > Run Build Task..." menu item,
-    then select "npm: watch". You will have to do this again every time
-    you reopen Visual Studio Code.
-
-That's it! Visual Studio Code will regenerate the JavaScript file every time you save.
+1. Installer avhengigheter:
+   - `npm install`
+2. Bygg TypeScript:
+   - `npm run build`
