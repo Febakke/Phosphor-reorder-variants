@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body {
+        margin: 0;
+        font: 12px/1.4 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--figma-color-bg);
+        color: var(--figma-color-text);
+      }
+
+      .wrap {
+        padding: 16px;
+      }
+
+      h2 {
+        margin: 0 0 8px;
+        font-size: 16px;
+      }
+
+      p {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--figma-color-text-secondary);
+      }
+
+      .meta {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+
+      .progress {
+        margin-top: 12px;
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: var(--figma-color-bg-secondary);
+      }
+
+      .bar {
+        height: 100%;
+        width: 0%;
+        background: var(--figma-color-bg-brand);
+        transition: width 80ms linear;
+      }
+
+      .stats {
+        margin-top: 8px;
+        font-size: 12px;
+      }
+
+      .footer {
+        margin-top: 14px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      button {
+        border: 1px solid var(--figma-color-border);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 12px;
+        cursor: pointer;
+        background: var(--figma-color-bg);
+        color: var(--figma-color-text);
+      }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: default;
+      }
+
+      #start {
+        border-color: var(--figma-color-bg-brand);
+        background: var(--figma-color-bg-brand);
+        color: var(--figma-color-text-onbrand);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h2>Reorder Variants</h2>
+      <p id="status">Klar til start.</p>
+      <p class="meta" id="meta">Bytter Stroke / Regular med Stroke / Light</p>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <p class="stats" id="stats">0 / 0</p>
+      <div class="footer">
+        <button id="start">Start</button>
+        <button id="cancel">Lukk</button>
+      </div>
+    </div>
+
+    <script>
+      const statusEl = document.getElementById("status");
+      const metaEl = document.getElementById("meta");
+      const barEl = document.getElementById("bar");
+      const statsEl = document.getElementById("stats");
+      const startBtn = document.getElementById("start");
+      const cancelBtn = document.getElementById("cancel");
+
+      function setProgress(processed, total) {
+        const percent = total > 0 ? Math.min(100, Math.round((processed / total) * 100)) : 0;
+        barEl.style.width = `${percent}%`;
+      }
+
+      onmessage = (event) => {
+        const msg = event.data.pluginMessage;
+        if (!msg) return;
+
+        if (msg.type === "init") {
+          startBtn.disabled = true;
+          statusEl.textContent = `Kjører på siden "${msg.pageName}"`;
+          metaEl.textContent = `Bytter ${msg.from} med ${msg.to}`;
+          statsEl.textContent = `0 / ${msg.total}`;
+          setProgress(0, msg.total);
+          return;
+        }
+
+        if (msg.type === "progress") {
+          statusEl.textContent = "Prosesserer componentSets...";
+          statsEl.textContent = `${msg.processed} / ${msg.total}  |  Byttet: ${msg.swapped}  |  Mangler variant: ${msg.missing}`;
+          setProgress(msg.processed, msg.total);
+          return;
+        }
+
+        if (msg.type === "done") {
+          startBtn.disabled = false;
+          statusEl.textContent = "Ferdig";
+          statsEl.textContent = `${msg.processed} / ${msg.total}  |  Byttet: ${msg.swapped}  |  Mangler variant: ${msg.missing}  |  Feil: ${msg.errors}`;
+          setProgress(msg.processed, msg.total);
+        }
+      };
+
+      startBtn.onclick = () => {
+        startBtn.disabled = true;
+        statusEl.textContent = "Starter prosessering...";
+        parent.postMessage({ pluginMessage: { type: "start" } }, "*");
+      };
+
+      cancelBtn.onclick = () => {
+        parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
+      };
+    </script>
+  </body>
+</html>
