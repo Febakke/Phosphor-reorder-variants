@@ -1,8 +1,9 @@
 figma.showUI(__html__, { width: 360, height: 220, themeColors: true });
 
-const TARGET_FORMAT = "Stroke";
-const DEFAULT_WEIGHT = "Regular";
-const SWAP_WEIGHT = "Light";
+const FROM_FORMAT = "Stroke";
+const FROM_WEIGHT = "Light";
+const TO_FORMAT = "Outline";
+const TO_WEIGHT = "Light";
 const BATCH_SIZE = 40;
 
 let isRunning = false;
@@ -11,12 +12,12 @@ type StartMessage = { type: "start" };
 type CancelMessage = { type: "cancel" };
 type PluginMessage = StartMessage | CancelMessage;
 
-function isTargetVariant(component: ComponentNode, weight: string): boolean {
+function isTargetVariant(component: ComponentNode, format: string, weight: string): boolean {
   const properties = component.variantProperties;
   if (!properties) {
     return false;
   }
-  return properties.Format === TARGET_FORMAT && properties.Weight === weight;
+  return properties.Format === format && properties.Weight === weight;
 }
 
 function swapPositions(nodeA: SceneNode, nodeB: SceneNode): void {
@@ -43,8 +44,8 @@ async function runReorder(): Promise<void> {
     type: "init",
     total,
     pageName: figma.currentPage.name,
-    from: `${TARGET_FORMAT} / ${DEFAULT_WEIGHT}`,
-    to: `${TARGET_FORMAT} / ${SWAP_WEIGHT}`,
+    from: `${FROM_FORMAT} / ${FROM_WEIGHT}`,
+    to: `${TO_FORMAT} / ${TO_WEIGHT}`,
   });
 
   if (total === 0) {
@@ -72,24 +73,25 @@ async function runReorder(): Promise<void> {
 
     for (const componentSet of batch) {
       try {
-        const regular = componentSet.children.find(
-          (node): node is ComponentNode => node.type === "COMPONENT" && isTargetVariant(node, DEFAULT_WEIGHT)
+        const fromVariant = componentSet.children.find(
+          (node): node is ComponentNode =>
+            node.type === "COMPONENT" && isTargetVariant(node, FROM_FORMAT, FROM_WEIGHT)
         );
-        const light = componentSet.children.find(
-          (node): node is ComponentNode => node.type === "COMPONENT" && isTargetVariant(node, SWAP_WEIGHT)
+        const toVariant = componentSet.children.find(
+          (node): node is ComponentNode => node.type === "COMPONENT" && isTargetVariant(node, TO_FORMAT, TO_WEIGHT)
         );
 
-        if (!regular || !light) {
+        if (!fromVariant || !toVariant) {
           missing += 1;
           continue;
         }
 
-        if (regular.id === light.id) {
+        if (fromVariant.id === toVariant.id) {
           skipped += 1;
           continue;
         }
 
-        swapPositions(regular, light);
+        swapPositions(fromVariant, toVariant);
         swapped += 1;
       } catch {
         errors += 1;
